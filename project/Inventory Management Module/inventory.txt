@@ -1,0 +1,98 @@
+<!-- inventory.html -->
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Inventory Management Module</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+        <div class="inventory-form">
+                <h1>Inventory Management</h1>
+                <form id="inventory-form">
+                        <label for="product">Product:</label>
+                        <select id="product" name="product">
+                                <option value="">Select Product</option>
+                                <!-- Product options will be fetched from the backend API -->
+                        </select>
+                        <label for="quantity">Quantity:</label>
+                        <input type="number" id="quantity" name="quantity">
+                        <button type="submit">Update Inventory</button>
+                </form>
+                <div class="inventory-table">
+                        <h2>Current Inventory:</h2>
+                        <table id="inventory-table">
+                                <thead>
+                                        <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <!-- Inventory data will be fetched from the backend API and displayed here -->
+                                </tbody>
+                        </table>
+                </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+</html>
+```
+
+```javascript
+// script.js
+const inventoryForm = document.getElementById('inventory-form');
+const productSelect = document.getElementById('product');
+const quantityInput = document.getElementById('quantity');
+const inventoryTable = document.getElementById('inventory-table');
+
+inventoryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const product = productSelect.value;
+        const quantity = quantityInput.value;
+
+        if (product && quantity) {
+                // Send update inventory request to backend API
+                fetch('/api/inventory', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ product, quantity }),
+                })
+                        .then((response) => response.json())
+                        .then((data) => {
+                                // Inventory updated successfully, display success message
+                                alert('Inventory updated successfully');
+                                // Fetch and display updated inventory data
+                                fetch('/api/inventory')
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                                // Clear existing inventory data
+                                                const inventoryTableBody = inventoryTable.tBodies[0];
+                                                while (inventoryTableBody.rows.length > 0) {
+                                                        inventoryTableBody.deleteRow(0);
+                                                }
+                                                // Display updated inventory data
+                                                data.forEach((item) => {
+                                                        const row = inventoryTable.insertRow(-1);
+                                                        const productCell = row.insertCell(0);
+                                                        const quantityCell = row.insertCell(1);
+                                                        productCell.textContent = item.product;
+                                                        quantityCell.textContent = item.quantity;
+                                                });
+                                        })
+                                        .catch((error) => {
+                                                // Error fetching inventory data
+                                                alert('Error fetching inventory data');
+                                        });
+                        })
+                        .catch((error) => {
+                                // Error updating inventory
+                                alert('Error updating inventory');
+                        });
+        } else {
+                // Invalid input
+                alert('Please enter valid input');
+        }
+});

@@ -1,0 +1,139 @@
+const express = require('express');
+const mysql = require('mysql');
+const app = express();
+
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'password',
+  database: 'database'
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to database:', err);
+    return;
+  }
+  console.log('Connected to database');
+});
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API Endpoints
+
+// Customers API
+app.get('/api/customers', (req, res) => {
+  db.query('SELECT * FROM customers', (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error fetching customers' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post('/api/customers', (req, res) => {
+  const { name, email } = req.body;
+  db.query('INSERT INTO customers SET ?', { name, email }, (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error creating customer' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+// Products API
+app.get('/api/products', (req, res) => {
+  db.query('SELECT * FROM products', (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error fetching products' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post('/api/products', (req, res) => {
+  const { name, description, price } = req.body;
+  db.query('INSERT INTO products SET ?', { name, description, price }, (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error creating product' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+// Orders API
+app.get('/api/orders', (req, res) => {
+  db.query('SELECT * FROM orders', (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error fetching orders' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post('/api/orders', (req, res) => {
+  const { customer_id, order_date, total, status } = req.body;
+  db.query('INSERT INTO orders SET ?', { customer_id, order_date, total, status }, (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error creating order' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+// Order Items API
+app.get('/api/order_items', (req, res) => {
+  db.query('SELECT * FROM order_items', (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error fetching order items' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post('/api/order_items', (req, res) => {
+  const { order_id, product_id, quantity } = req.body;
+  db.query('INSERT INTO order_items SET ?', { order_id, product_id, quantity }, (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error creating order item' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+// Reports API
+app.get('/api/reports', (req, res) => {
+  db.query('SELECT * FROM reports', (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error fetching reports' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.post('/api/reports', (req, res) => {
+  const { report_date, report_type, data } = req.body;
+  db.query('INSERT INTO reports SET ?', { report_date, report_type, data }, (err, results) => {
+    if (err) {
+      res.status(500).send({ message: 'Error creating report' });
+    } else {
+      res.send(results);
+    }
+  });
+});
+
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
+```

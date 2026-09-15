@@ -1,0 +1,99 @@
+<!-- products.html -->
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Product Management Module</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+        <div class="products-form">
+                <h1>Product Management</h1>
+                <form id="products-form">
+                        <label for="product-name">Product Name:</label>
+                        <input type="text" id="product-name" name="product-name">
+                        <label for="product-description">Product Description:</label>
+                        <textarea id="product-description" name="product-description"></textarea>
+                        <button type="submit">Add Product</button>
+                </form>
+                <div class="products-table">
+                        <h2>Current Products:</h2>
+                        <table id="products-table">
+                                <thead>
+                                        <tr>
+                                                <th>Product ID</th>
+                                                <th>Product Name</th>
+                                                <th>Product Description</th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <!-- Product data will be fetched from the backend API and displayed here -->
+                                </tbody>
+                        </table>
+                </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+</html>
+```
+
+```javascript
+// script.js
+const productsForm = document.getElementById('products-form');
+const productNameInput = document.getElementById('product-name');
+const productDescriptionInput = document.getElementById('product-description');
+const productsTable = document.getElementById('products-table');
+
+productsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const productName = productNameInput.value;
+        const productDescription = productDescriptionInput.value;
+
+        if (productName && productDescription) {
+                // Send add product request to backend API
+                fetch('/api/products', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ productName, productDescription }),
+                })
+                        .then((response) => response.json())
+                        .then((data) => {
+                                // Product added successfully, display success message
+                                alert('Product added successfully');
+                                // Fetch and display updated product data
+                                fetch('/api/products')
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                                // Clear existing product data
+                                                const productsTableBody = productsTable.tBodies[0];
+                                                while (productsTableBody.rows.length > 0) {
+                                                        productsTableBody.deleteRow(0);
+                                                }
+                                                // Display updated product data
+                                                data.forEach((item) => {
+                                                        const row = productsTable.insertRow(-1);
+                                                        const productIDCell = row.insertCell(0);
+                                                        const productNameCell = row.insertCell(1);
+                                                        const productDescriptionCell = row.insertCell(2);
+                                                        productIDCell.textContent = item.productID;
+                                                        productNameCell.textContent = item.productName;
+                                                        productDescriptionCell.textContent = item.productDescription;
+                                                });
+                                        })
+                                        .catch((error) => {
+                                                // Error fetching product data
+                                                alert('Error fetching product data');
+                                        });
+                        })
+                        .catch((error) => {
+                                // Error adding product
+                                alert('Error adding product');
+                        });
+        } else {
+                // Invalid input
+                alert('Please enter valid input');
+        }
+});
+```

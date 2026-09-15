@@ -1,0 +1,98 @@
+<!-- reports.html -->
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Reporting and Analytics Module</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+        <div class="reports-form">
+                <h1>Reporting and Analytics</h1>
+                <form id="reports-form">
+                        <label for="report-type">Report Type:</label>
+                        <select id="report-type" name="report-type">
+                                <option value="">Select Report Type</option>
+                                <!-- Report type options will be fetched from the backend API -->
+                        </select>
+                        <button type="submit">Generate Report</button>
+                </form>
+                <div class="reports-table">
+                        <h2>Current Reports:</h2>
+                        <table id="reports-table">
+                                <thead>
+                                        <tr>
+                                                <th>Report ID</th>
+                                                <th>Report Type</th>
+                                                <th>Report Date</th>
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <!-- Report data will be fetched from the backend API and displayed here -->
+                                </tbody>
+                        </table>
+                </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+</html>
+```
+
+```javascript
+// script.js
+const reportsForm = document.getElementById('reports-form');
+const reportTypeSelect = document.getElementById('report-type');
+const reportsTable = document.getElementById('reports-table');
+
+reportsForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const reportType = reportTypeSelect.value;
+
+        if (reportType) {
+                // Send generate report request to backend API
+                fetch('/api/reports', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ reportType }),
+                })
+                        .then((response) => response.json())
+                        .then((data) => {
+                                // Report generated successfully, display success message
+                                alert('Report generated successfully');
+                                // Fetch and display updated report data
+                                fetch('/api/reports')
+                                        .then((response) => response.json())
+                                        .then((data) => {
+                                                // Clear existing report data
+                                                const reportsTableBody = reportsTable.tBodies[0];
+                                                while (reportsTableBody.rows.length > 0) {
+                                                        reportsTableBody.deleteRow(0);
+                                                }
+                                                // Display updated report data
+                                                data.forEach((item) => {
+                                                        const row = reportsTable.insertRow(-1);
+                                                        const reportIDCell = row.insertCell(0);
+                                                        const reportTypeCell = row.insertCell(1);
+                                                        const reportDateCell = row.insertCell(2);
+                                                        reportIDCell.textContent = item.reportID;
+                                                        reportTypeCell.textContent = item.reportType;
+                                                        reportDateCell.textContent = item.reportDate;
+                                                });
+                                        })
+                                        .catch((error) => {
+                                                // Error fetching report data
+                                                alert('Error fetching report data');
+                                        });
+                        })
+                        .catch((error) => {
+                                // Error generating report
+                                alert('Error generating report');
+                        });
+        } else {
+                // Invalid input
+                alert('Please enter valid input');
+        }
+});
+```

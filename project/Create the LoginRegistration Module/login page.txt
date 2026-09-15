@@ -1,0 +1,147 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Login/Registration Module</title>
+        <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+        <div class="login-form">
+                <form id="login-form">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password">
+                        <button type="submit">Login</button>
+                </form>
+                <form id="register-form" style="display: none;">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username">
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password">
+                        <label for="confirm-password">Confirm Password:</label>
+                        <input type="password" id="confirm-password" name="confirm-password">
+                        <button type="submit">Register</button>
+                </form>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+</html>
+```
+
+```css
+/* styles.css */
+body {
+        font-family: Arial, sans-serif;
+}
+
+.login-form {
+        width: 300px;
+        margin: 50px auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-form form {
+        margin-bottom: 20px;
+}
+
+.login-form label {
+        display: block;
+        margin-bottom: 10px;
+}
+
+.login-form input {
+        width: 100%;
+        height: 40px;
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+}
+
+.login-form button[type="submit"] {
+        width: 100%;
+        height: 40px;
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+}
+
+.login-form button[type="submit"]:hover {
+        background-color: #3e8e41;
+}
+```
+
+```javascript
+// script.js
+const loginForm = document.getElementById('login-form');
+const registerForm = document.getElementById('register-form');
+
+loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        if (username && password) {
+                // Send login request to backend API
+                fetch('/api/login', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                })
+                        .then((response) => response.json())
+                        .then((data) => {
+                                // Login successful, redirect to dashboard
+                                window.location.href = '/dashboard';
+                        })
+                        .catch((error) => {
+                                // Login failed, display error message
+                                alert('Invalid username or password');
+                        });
+        } else {
+                // Invalid input, display error message
+                alert('Please enter both username and password');
+        }
+});
+
+registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirm-password').value;
+
+        if (username && email && password && confirmPassword && password === confirmPassword) {
+                // Send register request to backend API
+                fetch('/api/register', {
+                        method: 'POST',
+                        headers: {
+                                'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, email, password }),
+                })
+                        .then((response) => response.json())
+                        .then((data) => {
+                                // Registration successful, redirect to login page
+                                window.location.href = '/login';
+                        })
+                        .catch((error) => {
+                                // Registration failed, display error message
+                                alert('Registration failed, please try again');
+                        });
+        } else {
+                // Invalid input, display error message
+                alert('Please enter valid input');
+        }
+});
+```\
